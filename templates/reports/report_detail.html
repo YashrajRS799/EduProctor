@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Integrity Report – EduProctor{% endblock %}
+{% block page_title %}Integrity Report{% endblock %}
+{% block nav_reports %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h5 class="mb-0">{{ session.exam.title }}</h5>
+        <p class="text-muted mb-0">Student: <strong>{{ session.student.username }}</strong> &nbsp;·&nbsp; {{ session.start_time|date:"M d, Y H:i" }}</p>
+    </div>
+    {% if user.is_admin_user %}
+    <a href="{% url 'reports:report_list' %}" class="btn-ep outline"><i class="bi bi-arrow-left"></i> All Reports</a>
+    {% else %}
+    <a href="{% url 'accounts:student_dashboard' %}" class="btn-ep outline"><i class="bi bi-arrow-left"></i>
+        Dashboard</a>
+    {% endif %}
+</div>
+
+<div class="row g-4">
+    <!-- Score Summary -->
+    <div class="col-md-4">
+        <div class="card-ep h-100">
+            <div class="card-ep-header">
+                <h5>Exam Score</h5>
+            </div>
+            <div class="card-ep-body text-center">
+                <div
+                    class="score-circle mx-auto mb-3 {% if session.percentage >= 60 %}border-success{% elif session.percentage >= 40 %}border-warning{% else %}border-danger{% endif %}">
+                    <span
+                        class="score-num {% if session.percentage >= 60 %}text-success{% elif session.percentage >= 40 %}text-warning{% else %}text-danger{% endif %}">
+                        {{ session.percentage }}%
+                    </span>
+                    <span class="score-pct">{{ session.score }}/{{ session.total_marks }}</span>
+                </div>
+                <p class="text-muted" style="font-size: 0.875rem;">
+                    Status:
+                    <span
+                        class="badge-ep {% if session.status == 'completed' %}success{% elif session.status == 'flagged' %}danger{% else %}warning{% endif %}">
+                        {{ session.get_status_display }}
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Integrity Score -->
+    <div class="col-md-4">
+        <div class="card-ep h-100">
+            <div class="card-ep-header">
+                <h5>Integrity Score</h5>
+            </div>
+            <div class="card-ep-body text-center">
+                <div
+                    class="score-circle mx-auto mb-3 {% if report.risk_level == 'low' %}border-success{% elif report.risk_level == 'medium' %}border-warning{% else %}border-danger{% endif %}">
+                    <span
+                        class="score-num {% if report.risk_level == 'low' %}text-success{% elif report.risk_level == 'medium' %}text-warning{% else %}text-danger{% endif %}">
+                        {{ report.final_score }}
+                    </span>
+                    <span class="score-pct">/ 100</span>
+                </div>
+                <div class="risk-meter mb-2">
+                    <div class="risk-fill {{ report.risk_level }}" data-width="{{ report.final_score }}%"></div>
+                </div>
+                <span
+                    class="badge-ep {% if report.risk_level == 'low' %}success{% elif report.risk_level == 'medium' %}warning{% else %}danger{% endif %} mt-2">
+                    {{ report.get_risk_level_display }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Violation Stats -->
+    <div class="col-md-4">
+        <div class="card-ep h-100">
+            <div class="card-ep-header">
+                <h5>Violations</h5>
+            </div>
+            <div class="card-ep-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Total Events</span>
+                    <strong>{{ report.total_violations }}</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Violation Score</span>
+                    <strong
+                        class="{% if report.total_violation_score > 50 %}text-danger{% elif report.total_violation_score > 20 %}text-warning{% else %}text-success{% endif %}">
+                        {{ report.total_violation_score }}
+                    </strong>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Generated</span>
+                    <span>{{ report.generated_at|date:"M d, H:i" }}</span>
+                </div>
+                {% if report.notes %}
+                <hr>
+                <p style="font-size: 0.8rem; color: var(--text-muted); white-space: pre-line;">{{ report.notes }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Violation Log -->
+    <div class="col-lg-6">
+        <div class="card-ep">
+            <div class="card-ep-header">
+                <h5><i class="bi bi-exclamation-triangle me-2 text-warning"></i>Violation Log</h5>
+            </div>
+            <div class="card-ep-body p-0">
+                {% if violations %}
+                <table class="table-ep">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Severity</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for v in violations %}
+                        <tr>
+                            <td>
+                                <span
+                                    class="badge-ep {% if v.severity_score >= 7 %}danger{% elif v.severity_score >= 4 %}warning{% else %}secondary{% endif %}">
+                                    {{ v.get_violation_type_display }}
+                                </span>
+                            </td>
+                            <td>+{{ v.severity_score }}</td>
+                            <td>{{ v.timestamp|time:"H:i:s" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="p-4 text-center text-success"><i class="bi bi-shield-check fs-3"></i>
+                    <p class="mt-2">No violations recorded!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Answer Review -->
+    <div class="col-lg-6">
+        <div class="card-ep">
+            <div class="card-ep-header">
+                <h5><i class="bi bi-list-check me-2"></i>Answer Review</h5>
+            </div>
+            <div class="card-ep-body p-0">
+                {% if answers %}
+                <table class="table-ep">
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Answered</th>
+                            <th>Correct</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ans in answers %}
+                        <tr>
+                            <td style="font-size:0.8rem;">{{ ans.question.question_text|truncatechars:35 }}</td>
+                            <td><strong>{{ ans.selected_option|default:"–" }}</strong></td>
+                            <td>{{ ans.question.correct_answer }}</td>
+                            <td>
+                                {% if ans.is_correct %}
+                                <span class="badge-ep success">✓</span>
+                                {% else %}
+                                <span class="badge-ep danger">✗</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="p-4 text-center text-muted">No answers on record.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const bar = document.querySelector('[data-width]');
+        if (bar) {
+            bar.style.width = bar.getAttribute('data-width');
+        }
+    });
+</script>
+{% endblock %}

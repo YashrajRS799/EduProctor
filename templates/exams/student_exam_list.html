@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Available Exams – EduProctor{% endblock %}
+{% block page_title %}Available Exams{% endblock %}
+{% block nav_available_exams %}active{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <p class="text-muted">Exams currently open for you to take.</p>
+</div>
+
+{% if available_exams %}
+<div class="exam-cards">
+    {% for exam in available_exams %}
+    <div class="exam-card">
+        <div class="exam-card-header">
+            <div class="exam-card-title">{{ exam.title }}</div>
+            <div class="exam-card-meta">{{ exam.question_count }} questions</div>
+        </div>
+        <div class="exam-card-body">
+            {% if exam.description %}
+            <p style="font-size:0.875rem;color:var(--text-muted);">{{ exam.description|truncatechars:80 }}</p>
+            {% endif %}
+            <div class="exam-info-row"><i class="bi bi-clock"></i> {{ exam.duration_minutes }} minutes</div>
+            <div class="exam-info-row"><i class="bi bi-calendar"></i> Closes: {{ exam.end_time|date:"M d, Y H:i" }}
+            </div>
+            {% if exam.id in attempted_ids %}
+            <div class="exam-info-row text-warning"><i class="bi bi-check-circle"></i> Already attempted</div>
+            {% endif %}
+        </div>
+        <div class="exam-card-footer">
+            {% if exam.id in attempted_ids %}
+            <button class="btn-ep secondary w-100 justify-content-center" disabled>Already Submitted</button>
+            {% else %}
+            <a href="{% url 'exams:start_exam' exam.id %}" class="btn-ep primary w-100 justify-content-center"
+                id="start-{{ exam.id }}">
+                <i class="bi bi-play-fill"></i> Start Exam
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card-ep">
+    <div class="card-ep-body p-5 text-center">
+        <div style="font-size:3rem;">📚</div>
+        <p class="text-muted mt-3">No exams are currently available.</p>
+        <a href="{% url 'accounts:student_dashboard' %}" class="btn-ep outline mt-2">Go to Dashboard</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

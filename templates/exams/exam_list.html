@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}My Exams – EduProctor{% endblock %}
+{% block page_title %}Exam Management{% endblock %}
+{% block nav_exams %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <p class="text-muted mb-0">{{ exams.count }} exam{{ exams|length|pluralize }} total</p>
+    <a href="{% url 'exams:create_exam' %}" class="btn-ep primary">
+        <i class="bi bi-plus-circle"></i> New Exam
+    </a>
+</div>
+
+<div class="card-ep">
+    <div class="card-ep-body p-0">
+        {% if exams %}
+        <table class="table-ep">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Duration</th>
+                    <th>Questions</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exam in exams %}
+                <tr>
+                    <td>
+                        <strong>{{ exam.title }}</strong>
+                        {% if exam.description %}<br><small class="text-muted">{{ exam.description|truncatechars:50 }}</small>{% endif %}
+                    </td>
+                    <td>{{ exam.duration_minutes }} min</td>
+                    <td><span class="badge-ep primary">{{ exam.question_count }}</span></td>
+                    <td>{{ exam.start_time|date:"M d, H:i" }}</td>
+                    <td>{{ exam.end_time|date:"M d, H:i" }}</td>
+                    <td>
+                        {% if exam.is_available %}
+                        <span class="badge-ep success">Live</span>
+                        {% elif exam.is_active %}
+                        <span class="badge-ep warning">Scheduled</span>
+                        {% else %}
+                        <span class="badge-ep secondary">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'exams:exam_detail' exam.id %}" class="btn-ep outline"
+                                style="padding:0.3rem 0.7rem;font-size:0.8rem;">View</a>
+                            <a href="{% url 'exams:edit_exam' exam.id %}" class="btn-ep info"
+                                style="padding:0.3rem 0.7rem;font-size:0.8rem;">Edit</a>
+                            <a href="{% url 'exams:add_questions' exam.id %}" class="btn-ep secondary"
+                                style="padding:0.3rem 0.7rem;font-size:0.8rem;">Questions</a>
+                            <form method="post" action="{% url 'exams:delete_exam' exam.id %}" class="m-0 p-0" onsubmit="return confirm('Delete this exam? This action cannot be undone.');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-ep danger" style="padding:0.3rem 0.7rem;font-size:0.8rem;">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="p-5 text-center">
+            <div style="font-size:3rem;">📋</div>
+            <p class="text-muted mt-3">You haven't created any exams yet.</p>
+            <a href="{% url 'exams:create_exam' %}" class="btn-ep primary mt-2">Create First Exam</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

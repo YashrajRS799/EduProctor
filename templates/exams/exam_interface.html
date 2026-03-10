@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ exam.title }} – EduProctor Exam</title>
+    {% load static %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body class="exam-page">
+
+    <!-- Pass session id to JS -->
+    <script>window.EXAM_SESSION_ID = Number("{{ session.id|default:0 }}");</script>
+
+    <!-- Violation alert container -->
+    <div id="violation-alert-container"></div>
+
+    <!-- Exam Topbar -->
+    <header class="exam-topbar">
+        <div>
+            <div class="exam-title">{{ exam.title }}</div>
+            <div class="exam-meta">{{ exam.question_count }} questions &nbsp;·&nbsp; {{ exam.duration_minutes }} minutes</div>
+        </div>
+
+        <div id="exam-timer" data-seconds="{{ remaining_seconds }}">
+            {{ remaining_seconds|floatformat:0 }}
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            <span style="color:rgba(255,255,255,0.5);font-size:0.85rem;">
+                <i class="bi bi-camera-video me-1"></i> Monitored
+            </span>
+            <span style="font-size:0.85rem;color:rgba(255,255,255,0.6);">{{ request.user.username }}</span>
+        </div>
+    </header>
+
+    <!-- Exam Form -->
+    <div class="exam-container">
+        <form method="post" action="{% url 'exams:submit_exam' session.id %}" id="exam-form">
+            {% csrf_token %}
+
+            {% for question in questions %}
+            <div class="question-card" id="qcard-{{ forloop.counter }}">
+                <div class="question-number">Question {{ forloop.counter }} of {{ questions|length }}</div>
+                <div class="question-text">{{ question.question_text }}</div>
+
+                <div class="options-grid">
+                    {% for key, text in question.get_options %}
+                    <label class="option-card" for="q_{{ question.id }}_{{ key }}">
+                        <input type="radio" name="q_{{ question.id }}" id="q_{{ question.id }}_{{ key }}"
+                            value="{{ key }}" style="display:none;">
+                        <span style="
+            width:28px;height:28px;border-radius:50%;
+            background:rgba(37,99,235,0.15);
+            border:2px solid rgba(37,99,235,0.3);
+            display:flex;align-items:center;justify-content:center;
+            font-size:0.75rem;font-weight:700;color:#818cf8;flex-shrink:0;">
+                            {{ key }}
+                        </span>
+                        <label class="option-label" for="q_{{ question.id }}_{{ key }}">{{ text }}</label>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
+        </form>
+    </div>
+
+    <!-- Submit bar -->
+    <div class="exam-submit-bar">
+        <div style="color:rgba(255,255,255,0.5);font-size:0.875rem;">
+            <i class="bi bi-shield-check me-1"></i>
+            Your session is being monitored for academic integrity.
+        </div>
+        <button type="submit" form="exam-form" class="btn-ep primary" id="btn-submit-exam"
+            style="font-size:1rem;padding:0.75rem 2rem;">
+            <i class="bi bi-send-check"></i> Submit Exam
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/timer.js' %}"></script>
+    <script src="{% static 'js/monitoring.js' %}"></script>
+    <script src="{% static 'js/exam.js' %}"></script>
+</body>
+
+</html>

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Login – EduProctor{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block body %}
+{% block auth_body %}
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-logo">Edu<span>Proctor</span></div>
+        <p class="auth-subtitle">Online Examination Monitoring System</p>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert-ep {% if message.tags == 'error' %}error{% else %}success{% endif %} mb-3">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="post" action="{% url 'accounts:login' %}" id="login-form">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="id_username" class="form-label">Username</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <div class="text-danger mt-1" style="font-size:0.8rem;">{{ form.username.errors.as_text }}</div>
+                {% endif %}
+            </div>
+            <div class="mb-3">
+                <label for="id_password" class="form-label">Password</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                <div class="text-danger mt-1" style="font-size:0.8rem;">{{ form.password.errors.as_text }}</div>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn-auth" id="btn-login">
+                <span>Sign In</span>
+            </button>
+        </form>
+
+        <div class="auth-link">
+            Don't have an account? <a href="{% url 'accounts:register' %}">Register here</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% endblock %}

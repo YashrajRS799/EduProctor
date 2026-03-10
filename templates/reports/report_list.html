@@ -1,0 +1,86 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Integrity Reports – EduProctor{% endblock %}
+{% block page_title %}Integrity Reports{% endblock %}
+{% block nav_reports %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <!-- Filter by exam -->
+    <form method="get" class="d-flex align-items-center gap-2" id="filter-form">
+        <label class="text-muted" style="font-size:0.875rem;">Filter by Exam:</label>
+        <select name="exam" class="form-select form-select-sm" style="width:auto;" onchange="this.form.submit()">
+            <option value="">All Exams</option>
+            {% for exam in exams %}
+            <option value="{{ exam.id }}" {% if selected_exam_id == exam.id %}selected{% endif %}>{{ exam.title }}
+            </option>
+            {% endfor %}
+        </select>
+    </form>
+    <a href="{% url 'reports:export_csv' %}{% if selected_exam_id %}?exam={{ selected_exam_id }}{% endif %}"
+        class="btn-ep success" id="btn-export">
+        <i class="bi bi-download"></i> Export CSV
+    </a>
+</div>
+
+<div class="card-ep">
+    <div class="card-ep-body p-0">
+        {% if sessions %}
+        <table class="table-ep">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Exam</th>
+                    <th>Score</th>
+                    <th>Status</th>
+                    <th>Violations</th>
+                    <th>Integrity</th>
+                    <th>Risk</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in sessions %}
+                <tr>
+                    <td><strong>{{ session.student.username }}</strong></td>
+                    <td>{{ session.exam.title|truncatechars:25 }}</td>
+                    <td>{{ session.score }}/{{ session.total_marks }}<br><small class="text-muted">{{ session.percentage }}%</small></td>
+                    <td>
+                        <span
+                            class="badge-ep {% if session.status == 'completed' %}success{% elif session.status == 'flagged' %}danger{% elif session.status == 'in_progress' %}warning{% else %}secondary{% endif %}">
+                            {{ session.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="text-center">{{ session.total_violation_score }}</td>
+                    <td>
+                        {% if session.integrity_report %}
+                        <strong>{{ session.integrity_report.final_score }}</strong>
+                        {% else %}–{% endif %}
+                    </td>
+                    <td>
+                        {% if session.integrity_report %}
+                        <span
+                            class="badge-ep {% if session.integrity_report.risk_level == 'low' %}success{% elif session.integrity_report.risk_level == 'medium' %}warning{% else %}danger{% endif %}">
+                            {{ session.integrity_report.get_risk_level_display }}
+                        </span>
+                        {% else %}–{% endif %}
+                    </td>
+                    <td>{{ session.start_time|date:"M d, Y" }}</td>
+                    <td>
+                        <a href="{% url 'reports:report_detail' session.id %}" class="btn-ep outline"
+                            style="padding:0.3rem 0.7rem;font-size:0.8rem;">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="p-5 text-center">
+            <div style="font-size:3rem;">📊</div>
+            <p class="text-muted mt-3">No reports available yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

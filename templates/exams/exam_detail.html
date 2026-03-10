@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}{{ exam.title }} – EduProctor{% endblock %}
+{% block page_title %}{{ exam.title }}{% endblock %}
+{% block nav_exams %}active{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Exam Info -->
+    <div class="col-lg-4">
+        <div class="card-ep mb-4">
+            <div class="card-ep-header">
+                <h5><i class="bi bi-info-circle me-2"></i>Exam Info</h5>
+                <a href="{% url 'exams:add_questions' exam.id %}" class="btn-ep primary" style="font-size:0.8rem;">Edit
+                    Questions</a>
+            </div>
+            <div class="card-ep-body">
+                <table class="table table-sm">
+                    <tr>
+                        <td class="text-muted">Title</td>
+                        <td><strong>{{ exam.title }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Duration</td>
+                        <td>{{ exam.duration_minutes }} min</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Questions</td>
+                        <td>{{ exam.question_count }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Start</td>
+                        <td>{{ exam.start_time|date:"M d, Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">End</td>
+                        <td>{{ exam.end_time|date:"M d, Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Status</td>
+                        <td>
+                            {% if exam.is_active %}<span class="badge-ep success">Active</span>
+                            {% else %}<span class="badge-ep secondary">Inactive</span>{% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-ep">
+            <div class="card-ep-header">
+                <h5>Questions</h5>
+            </div>
+            <div class="card-ep-body p-0">
+                {% for q in questions %}
+                <div style="padding:0.75rem 1.25rem;border-bottom:1px solid var(--border-color);font-size:0.875rem;">
+                    <span class="text-muted" style="font-size:0.75rem;">Q{{ forloop.counter }}</span>
+                    <p class="mb-0 mt-1">{{ q.question_text|truncatechars:70 }}</p>
+                    <small class="text-muted">Correct: <strong>{{ q.correct_answer }}</strong> | {{ q.marks }}
+                        mark</small>
+                </div>
+                {% empty %}
+                <div class="p-3 text-center text-muted">No questions yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sessions -->
+    <div class="col-lg-8">
+        <div class="card-ep">
+            <div class="card-ep-header">
+                <h5><i class="bi bi-people me-2"></i>Student Sessions</h5>
+                <a href="{% url 'reports:report_list' %}?exam={{ exam.id }}" class="btn-ep outline"
+                    style="font-size:0.8rem;">Reports</a>
+            </div>
+            <div class="card-ep-body p-0">
+                {% if sessions %}
+                <table class="table-ep">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                            <th>Violations</th>
+                            <th>Date</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in sessions %}
+                        <tr>
+                            <td><strong>{{ session.student.username }}</strong></td>
+                            <td>{{ session.score }}/{{ session.total_marks }} ({{ session.percentage }}%)</td>
+                            <td>
+                                <span
+                                    class="badge-ep {% if session.status == 'completed' %}success{% elif session.status == 'flagged' %}danger{% elif session.status == 'in_progress' %}warning{% else %}secondary{% endif %}">
+                                    {{ session.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <span
+                                    class="{% if session.total_violation_score > 50 %}text-danger{% elif session.total_violation_score > 20 %}text-warning{% else %}text-success{% endif %} fw-bold">
+                                    {{ session.total_violation_score }}
+                                </span>
+                            </td>
+                            <td>{{ session.start_time|date:"M d, H:i" }}</td>
+                            <td>
+                                <a href="{% url 'reports:report_detail' session.id %}" class="btn-ep outline"
+                                    style="padding:0.3rem 0.7rem;font-size:0.8rem;">Report</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="p-4 text-center text-muted">No students have taken this exam yet.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

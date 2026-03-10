@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_edit %}Edit Exam – EduProctor{% else %}Create Exam – EduProctor{% endif %}{% endblock %}
+{% block page_title %}{% if is_edit %}Edit Exam{% else %}Create New Exam{% endif %}{% endblock %}
+{% block nav_create_exam %}active{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card-ep">
+            <div class="card-ep-header">
+                <h5><i class="bi bi-journal-plus me-2" style="color:var(--primary)"></i>Exam Details</h5>
+                <a href="{% url 'exams:exam_list' %}" class="btn-ep outline"><i class="bi bi-arrow-left"></i> Back</a>
+            </div>
+            <div class="card-ep-body">
+                <form method="post" class="form-ep" id="create-exam-form">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Exam Title *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="text-danger mt-1" style="font-size:0.8rem;">{{form.title.errors.as_text }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            {{ form.description }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Duration (minutes) *</label>
+                            {{ form.duration_minutes }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Start Time *</label>
+                            {{ form.start_time }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">End Time *</label>
+                            {{ form.end_time }}
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                {{ form.is_active }} <label class="form-check-label ms-2">Active (students can see this exam)</label>
+                            </div>
+                        </div>
+                    </div>
+                    {% if form.non_field_errors %}
+                    <div class="alert-ep error mt-3">{{ form.non_field_errors.as_text }}</div>
+                    {% endif %}
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn-ep primary" id="btn-create-exam">
+                            <i class="bi bi-arrow-right-circle"></i>
+                            {% if is_edit %}Save Changes{% else %}Create & Add Questions{% endif %}
+                        </button>
+                        <a href="{% url 'exams:exam_list' %}" class="btn-ep secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

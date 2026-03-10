@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}System Information – EduProctor{% endblock %}
+{% block page_title %}System Information{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Objectives -->
+    <div class="col-lg-6">
+        <div class="card-ep h-100">
+            <div class="card-ep-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-target me-2"></i>Project Objectives</h5>
+            </div>
+            <div class="card-ep-body">
+                <ul class="list-group list-group-flush border-0">
+                    <li class="list-group-item bg-transparent border-0 ps-0">
+                        <i class="bi bi-shield-check text-primary me-2"></i>
+                        <strong>Secure Platform</strong>: Develop a secure platform for conducting and monitoring online
+                        examinations.
+                    </li>
+                    <li class="list-group-item bg-transparent border-0 ps-0">
+                        <i class="bi bi-person-check text-primary me-2"></i>
+                        <strong>Identity Verification</strong>: Verify candidate identity before and during the exam
+                        session.
+                    </li>
+                    <li class="list-group-item bg-transparent border-0 ps-0">
+                        <i class="bi bi-camera-video text-primary me-2"></i>
+                        <strong>Live Activity Monitoring</strong>: Monitor live exam activity using AI-based behavior
+                        analysis.
+                    </li>
+                    <li class="list-group-item bg-transparent border-0 ps-0">
+                        <i class="bi bi-window-stack text-primary me-2"></i>
+                        <strong>Behavioral Detection</strong>: Detect tab switching, screen changes, and suspicious
+                        activities.
+                    </li>
+                    <li class="list-group-item bg-transparent border-0 ps-0">
+                        <i class="bi bi-flag text-primary me-2"></i>
+                        <strong>Violation Recording</strong>: Automatically flag and record exam rule violations.
+                    </li>
+                    <li class="list-group-item bg-transparent border-0 ps-0">
+                        <i class="bi bi-calculator text-primary me-2"></i>
+                        <strong>Scoring Engine</strong>: Calculate violation severity using a scoring engine.
+                    </li>
+                    <li class="list-group-item bg-transparent border-0 ps-0">
+                        <i class="bi bi-file-earmark-bar-graph text-primary me-2"></i>
+                        <strong>Integrity Reporting</strong>: Generate integrity reports for exam administrators.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Limitations -->
+    <div class="col-lg-6">
+        <div class="card-ep h-100">
+            <div class="card-ep-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Project Limitations</h5>
+            </div>
+            <div class="card-ep-body">
+                <ul class="list-group list-group-flush border-0">
+                    <li class="list-group-item bg-transparent border-0 ps-0">
+                        <i class="bi bi-wifi-off text-warning me-2"></i>
+                        <strong>Internet Stability</strong>: Requires a stable internet connection for uninterrupted
+                        monitoring.
+                    </li>
+                    <li class="list-group-item bg-transparent border-0 ps-0">
+                        <i class="bi bi-patch-question text-warning me-2"></i>
+                        <strong>AI Accuracy</strong>: AI-based behavior detection may produce false positives in rare
+                        cases.
+                    </li>
+                    <li class="list-group-item bg-transparent border-0 ps-0">
+                        <i class="bi bi-cpu text-warning me-2"></i>
+                        <strong>Hardware Dependent</strong>: System performance depends on hardware and camera quality.
+                    </li>
+                    <li class="list-group-item bg-transparent border-0 ps-0">
+                        <i class="bi bi-brightness-low text-warning me-2"></i>
+                        <strong>Lighting Conditions</strong>: Advanced facial recognition accuracy may vary in low-light
+                        conditions.
+                    </li>
+                    <li class="list-group-item bg-transparent border-0 ps-0">
+                        <i class="bi bi-cloud-slash text-warning me-2"></i>
+                        <strong>Online Only</strong>: Not suitable for offline examinations.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4 text-center">
+    <p class="text-muted" style="font-size: 0.9rem;">
+        EduProctor is designed to maintain the highest standards of academic integrity in remote learning environments.
+    </p>
+    <a href="javascript:history.back()" class="btn-ep outline">
+        <i class="bi bi-arrow-left me-2"></i> Go Back
+    </a>
+</div>
+{% endblock %}

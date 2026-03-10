@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard – EduProctor{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+{% block nav_dash %}active{% endblock %}
+
+{% block content %}
+<!-- Stats Row -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">📋</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ total_exams }}</div>
+            <div class="stat-label">Total Exams</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">👥</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ total_students }}</div>
+            <div class="stat-label">Students Assessed</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon red">🚨</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ flagged_sessions }}</div>
+            <div class="stat-label">Flagged Sessions</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple">📊</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ recent_sessions|length }}</div>
+            <div class="stat-label">Recent Sessions</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Exams Card -->
+    <div class="col-lg-6">
+        <div class="card-ep">
+            <div class="card-ep-header">
+                <h5><i class="bi bi-journal-bookmark me-2"></i>Your Exams</h5>
+                <a href="{% url 'exams:create_exam' %}" class="btn-ep primary">
+                    <i class="bi bi-plus"></i> New Exam
+                </a>
+            </div>
+            <div class="card-ep-body p-0">
+                {% if exams %}
+                <table class="table-ep">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Questions</th>
+                            <th>Sessions</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exam in exams %}
+                        <tr>
+                            <td><strong>{{ exam.title }}</strong></td>
+                            <td>{{ exam.question_count }}</td>
+                            <td>{{ exam.session_count }}</td>
+                            <td>
+                                {% if exam.is_active %}
+                                <span class="badge-ep success">Active</span>
+                                {% else %}
+                                <span class="badge-ep secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'exams:exam_detail' exam.id %}" class="btn-ep outline"
+                                    style="padding:0.3rem 0.75rem;font-size:0.8rem;">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="p-4 text-center text-muted">No exams yet. <a href="{% url 'exams:create_exam' %}">Create
+                        one!</a></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Sessions -->
+    <div class="col-lg-6">
+        <div class="card-ep">
+            <div class="card-ep-header">
+                <h5><i class="bi bi-clock-history me-2"></i>Recent Sessions</h5>
+                <a href="{% url 'reports:report_list' %}" class="btn-ep outline" style="font-size:0.8rem;">View All</a>
+            </div>
+            <div class="card-ep-body p-0">
+                {% if recent_sessions %}
+                <table class="table-ep">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Exam</th>
+                            <th>Status</th>
+                            <th>Violations</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in recent_sessions %}
+                        <tr>
+                            <td>{{ session.student.username }}</td>
+                            <td>{{ session.exam.title|truncatechars:20 }}</td>
+                            <td>
+                                <span
+                                    class="badge-ep {% if session.status == 'completed' %}success{% elif session.status == 'flagged' %}danger{% elif session.status == 'in_progress' %}warning{% else %}secondary{% endif %}">
+                                    {{ session.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ session.total_violation_score }}</td>
+                            <td>
+                                <a href="{% url 'reports:report_detail' session.id %}" class="btn-ep outline"
+                                    style="padding:0.3rem 0.75rem;font-size:0.8rem;">Report</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="p-4 text-center text-muted">No sessions yet.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
